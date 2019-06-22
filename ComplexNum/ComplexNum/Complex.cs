@@ -8,75 +8,180 @@ namespace ComplexNum
 {
     class Complex
     {
-        public double r, i;
- 
-        public Complex()
+        private double m_real;
+        private double m_imag;
+
+        #region Конструкторы
+
+        public Complex(double re)
         {
-            this.r = 0.0;
-            this.i = 0.0;
+            m_real = re;
+            m_imag = 0.0;
         }
-        public Complex(double a, double b)
+
+        public Complex(double re, double im)
         {
-            Complex res = new Complex();
-            res.r = a;
-            res.i = b;
+            m_real = re;
+            m_imag = im;
         }
-        public static Complex Sum(Complex a, Complex b)
+
+        public Complex(Complex x)
         {
-            Complex res = new Complex();
-            res.r = a.r + b.r;
-            res.i = a.i + b.i;
-            return res;
+            m_real = x.Real;
+            m_imag = x.Imag;
         }
-        public static Complex Multiplication(Complex a, Complex b)
+        #endregion
+
+        public double Real
         {
-            Complex res = new Complex();
-            res.r = a.r * b.r - a.i * b.i;
-            res.i = a.i * b.r + a.r * b.i;
-            return res;
+            get { return m_real; }
+            set { m_real = value; }
         }
- 
-        public static Complex Subtract(Complex a, Complex b)
+
+        public double Imag
         {
-            Complex res = new Complex();
-            res.r = a.r - b.r;
-            res.i = a.i - b.i;
-            return res;
+            get { return m_imag; }
+            set { m_imag = value; }
         }
- 
-        public static Complex operator +(Complex a, Complex b)
+
+        public double Abs
         {
-            return Complex.Sum(a, b);
+            get { return Math.Sqrt(m_imag * m_imag + m_real * m_real); }
         }
- 
-        public static Complex operator -(Complex a, Complex b)
+
+        public double Arg
         {
-            return Complex.Subtract(a, b);
+            get { return Math.Atan(m_imag / m_real); }
         }
- 
-        public static Complex operator *(Complex a, Complex b)
+
+        /// <summary>
+        /// Получить комплексно-сопряженное число
+        /// </summary>
+        public Complex GetConjugate()
         {
-            return Complex.Multiplication(a, b);
+            return new Complex(m_real, -m_imag);
         }
-        public static Complex operator /(Complex a, Complex b)
-        {
-            double Denominator = b.r * b.r + b.i * b.i;
-            return new Complex((a.r * b.r + a.i * b.i) / Denominator,
-                (b.r * a.i - b.i * a.r) / Denominator);
-        }
+
         public override string ToString()
         {
-            return String.Format("{0} + i{1}", this.r, this.i);
+            string res = "";
+
+            if (m_real != 0.0)
+            {
+                res = m_real.ToString();
+            }
+
+            if (m_imag != 0.0)
+            {
+                if (m_imag > 0)
+                {
+                    res += "+";
+                }
+
+                res += m_imag.ToString() + "i";
+            }
+
+            return res;
         }
- 
-        public void Print(Complex a)
+
+        #region Перегруженные операторы сложения
+        public static Complex operator +(Complex c1, Complex c2)
         {
-            Console.Write(a);
+            return new Complex(c1.Real + c2.Real, c1.Imag + c2.Imag);
         }
- 
-        public void PrintLine(Complex a)
+
+        public static Complex operator +(Complex c1, double c2)
         {
-            Console.WriteLine(a);
+            return new Complex(c1.Real + c2, c1.Imag);
+        }
+
+        public static Complex operator +(double c1, Complex c2)
+        {
+            return new Complex(c1 + c2.Real, c2.Imag);
+        }
+        #endregion
+
+
+        #region Перегруженные операторы вычитания
+        public static Complex operator -(Complex c1, Complex c2)
+        {
+            return new Complex(c1.Real - c2.Real, c1.Imag - c2.Imag);
+        }
+
+        public static Complex operator -(Complex c1, double c2)
+        {
+            return new Complex(c1.Real - c2, c1.Imag);
+        }
+
+        public static Complex operator -(double c1, Complex c2)
+        {
+            return new Complex(c1 - c2.Real, -c2.Imag);
+        }
+        #endregion
+
+
+        #region Перегруженные операторы умножения
+        public static Complex operator *(Complex c1, Complex c2)
+        {
+            return new Complex(c1.Real * c2.Real - c1.Imag * c2.Imag,
+                c1.Real * c2.Imag + c1.Imag * c2.Real);
+        }
+
+        public static Complex operator *(Complex c1, double c2)
+        {
+            return new Complex(c1.Real * c2, c1.Imag * c2);
+        }
+
+        public static Complex operator *(double c1, Complex c2)
+        {
+            return new Complex(c1 * c2.Real, c1 * c2.Imag);
+        }
+        #endregion
+
+
+        #region Перегруженные операторы деления
+        public static Complex operator /(Complex c1, Complex c2)
+        {
+            double Denominator = c2.Real * c2.Real + c2.Imag * c2.Imag;
+            return new Complex((c1.Real * c2.Real + c1.Imag * c2.Imag) / Denominator,
+                (c2.Real * c1.Imag - c2.Imag * c1.Real) / Denominator);
+        }
+
+        public static Complex operator /(Complex c1, double c2)
+        {
+            return new Complex(c1.Real / c2, c1.Imag / c2);
+        }
+
+        public static Complex operator /(double c1, Complex c2)
+        {
+            double Denominator = c2.Real * c2.Real + c2.Imag * c2.Imag;
+            return new Complex((c1 * c2.Real) / Denominator, (-c2.Imag * c1) / Denominator);
+        }
+        #endregion
+
+        public static bool operator ==(Complex c1, Complex c2)
+        {
+            return c1.Real == c2.Real && c1.Imag == c2.Imag;
+        }
+
+        public static bool operator !=(Complex c1, Complex c2)
+        {
+            return c1.Real != c2.Real || c1.Imag != c2.Imag;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
+            return this == (Complex)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_real.GetHashCode() + m_imag.GetHashCode();
         }
     }
 }
